@@ -1,15 +1,24 @@
 const express = require("express");
 const router = express.Router();
 const controllers = require("../controllers/wallet");
-const middlewares = require("../middlewares/auth");
+const auth = require("../middlewares/auth");
+const balances = require("../middlewares/balances");
 
 router.get("/", controllers.get_started);
 router.post("/register", controllers.register);
 router.get("/verify/:id", controllers.verify);
 router.post("/login", controllers.login);
-router.post("/initialize/payment", middlewares.authenticateToken, controllers.initialize_payment);
-router.post("/confirm", middlewares.authenticateToken, controllers.verify_payment);
-router.post("/topup", middlewares.authenticateToken, controllers.top_up);
+router.route("/reset/password").post(controllers.forgotten_password);
+router.route("/reset/password/:id/:u_str").get(controllers.reset_password);
+router.route("/get_new_pass/:id/:u_str").post(controllers.get_new_pass);
+router.post("/dashboard/flutterwallet", auth.authenticateToken, controllers.flutterWallet);
+router.get("/dashboard/flutterpaymentcheck", auth.authenticateToken, controllers.flutterPaymentCheck);
+router.post("/dashboard/topup", [auth.authenticateToken, auth.topup_token, balances.topup_balance], controllers.top_up);
+router.get("/dashboard/utility/", [auth.authenticateToken, auth.util_token], controllers.electricity_util);
+router.post("/dashboard/utility/", [auth.authenticateToken, auth.util_token, balances.util_balance], controllers.electricity_payment);
+router.post("/dashboard/utility/verify", [auth.authenticateToken, auth.util_token], controllers.electricity_verification);
+router.post("/dashboard/transfer/", auth.authenticateToken, controllers.transfer);
+
 
 
 module.exports = router;
