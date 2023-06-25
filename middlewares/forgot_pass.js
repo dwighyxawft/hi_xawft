@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require("uuid");
   const fns = {
     send: function (id, email) {
       const uniqueString = uuidv4() + id;
-      const currentUrl = "https://xawftloan.onrender.com/api/v1/loan/";
+      const currentUrl = "https://xawftly.onrender.com/wallet";
       var transport = nodemailer.createTransport({
         host: process.env.SMTP_HOSTNAME,
         port: process.env.AUTH_SMTP_PORT,
