@@ -18,6 +18,9 @@ router.get("/dashboard/utility/", [auth.authenticateToken, auth.util_token], con
 router.post("/dashboard/utility/", [auth.authenticateToken, auth.util_token, balances.util_balance], controllers.electricity_payment);
 router.post("/dashboard/utility/verify", [auth.authenticateToken, auth.util_token], controllers.electricity_verification);
 router.post("/dashboard/transfer/", auth.authenticateToken, controllers.transfer);
+router.post("/dashboard/withdrawal/", auth.authenticateToken, controllers.withdraw);
+router.post("/dashboard/giftcards/", [auth.authenticateToken, auth.gift_token], controllers.getAvailable);
+router.post("/dashboard/giftcards/order", [auth.authenticateToken, auth.gift_token, balances.gift_balance], controllers.orderGiftcard);
 
 
 

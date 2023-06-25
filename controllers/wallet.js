@@ -15,6 +15,7 @@ const Electricity = require("../models/Utility");
 // Payment record model
 const PaymentRecord = require("../models/paymentRecord");
 const Transfer = require("../models/Transfers");
+const Withdrawal = require("../models/Withdrawals");
 
 // Salt Round Value
 const saltRound = 10;
@@ -403,8 +404,8 @@ const flutterWallet = async (req, res, next) => {
             },
             customer: {
               email: userData.email,
-              phonenumber: userData.phone_number,
-              name: userData.full_name,
+              phonenumber: userData.phone,
+              name: userData.name,
             },
             customizations: {
               title: "hi_xawft Inc.",
@@ -868,12 +869,7 @@ const transfer = async function(req, res){
                   console.log(err);
                 })
               }else{
-                      const transfer = new Transfer({sender_email: sender.email, receiver_email: receiver.email, amount: amount, transaction_id: generateRandomString(), status: "declined"});
-                      transfer.save().then(function(){
-                        res.status(200).json({msg: "Your transfer was unsuccessful, Please fund your wallet", transfer});
-                      }).catch(function(err){
-                        console.log(err);
-                      })
+                res.status(200).json({msg: "Your transfer was unsuccessful, Please fund your wallet"});
               }
           }else{
             res.status(400).json({msg: "User does not exist. Please use another email and try again"});
@@ -882,10 +878,187 @@ const transfer = async function(req, res){
   })
 }
 
+const withdraw = function(req, res, next){
+  User.findOne({_id: {$eq: req.user}}).then(function(user){
+    const reference_code = generateRandomString();
+  const { account_bank, account_number, amount, narration } = req.body;
+  const details = {
+    account_bank: account_bank,
+    account_number: account_number,
+    amount: amount,
+    currency: "NGN",
+    narration: narration,
+    reference: reference_code,
+  };
+  flw.Transfer.initiate(details).then((response) => {
+    const withdrawal = new Withdrawal({
+      userId: user._id,
+      email: user.email,
+      reference_code: reference_code,
+      amount: amount,
+      account_number: account_number,
+      account_bank: account_bank,
+    });
+
+    withdrawal.save().then(() => {
+        res.status(201).json({
+          status: "success",
+          message: "Your withdrawal is being processed.",
+        });
+      })
+      .catch((error) => {
+        next(error);
+      });
+  }).catch((error) => {
+    console.log(error);
+    res.json(error)
+  });
+  }).catch(function(err){
+    console.log(err)
+  })
+}
+
+const getAvailable = function(req, res, next){
+  const { country } = req.query;
+  const tokenData = req.reloadly;
+  if (country != "US" && country != "NG") {
+    res
+      .status(404)
+      .json({ message: "This country is not available yet on payflex" });
+    return;
+  }
+  const options = {
+    hostname: "giftcards.reloadly.com",
+    path: `/countries/${country}/products`,
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${tokenData}`,
+    },
+  };
+
+  const reqGet = https.request(options, (resGet) => {
+    let data = "";
+
+    resGet.on("data", (chunk) => {
+      data += chunk;
+    });
+
+    resGet.on("end", () => {
+      const response = JSON.parse(data);
+      res.status(200).json(response);
+    });
+  });
+
+  reqGet.on("error", (error) => {
+    next(error);
+  });
+
+  reqGet.end();
+};
+
+const orderGiftcard = function(req, res, next){
+  const tokenData = req.reloadly;
+  User.findOne({_id: {$eq: tokenData}}).then(function(user){
+    const {
+      productIdString,
+      quantityString,
+      unitPriceString,
+      customIdentifier,
+      recipientEmail,
+      recipientCountryCode,
+      recipientPhoneNumber,
+    } = req.body;
+  
+    const [productId, quantity, unitPrice] = [
+      parseInt(productIdString),
+      parseInt(quantityString),
+      parseInt(unitPriceString),
+    ];
+  
+    const options = {
+      hostname: "giftcards.reloadly.com",
+      path: "/orders",
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${tokenData}`,
+        "Content-Type": "application/json",
+      },
+    };
+  
+    const data = JSON.stringify({
+      productId: productId,
+      countryCode: "NG",
+      quantity: quantity,
+      unitPrice: unitPrice,
+      customIdentifier: customIdentifier,
+      senderName: full_name,
+      recipientEmail: recipientEmail,
+      recipientPhoneDetails: {
+        countryCode: recipientCountryCode,
+        phoneNumber: recipientPhoneNumber,
+      },
+    });
+
+    if(user.balance >= unitPrice && req.balance >= unitPrice){
+      
+  
+    const reqOrder = https.request(options, (resOrder) => {
+      let responseData = "";
+      resOrder.on("data", (chunk) => {
+        responseData += chunk;
+      });
+  
+      resOrder.on("end", () => {
+        const response = JSON.parse(responseData);
+        const brandId = response.product.brand.brandId;
+        const options1 = {
+          hostname: "giftcards.reloadly.com",
+          path: `/redeem-instructions/${brandId}`,
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${tokenData}`,
+          },
+        };
+  
+        const reqInfo = https.request(options1, (resInfo) => {
+          let responseData2 = "";
+          resInfo.on("data", (chunk) => {
+            responseData2 += chunk;
+          });
+  
+          resInfo.on("end", () => {
+            const response2 = JSON.parse(responseData2);
+            res
+              .status(200)
+              .json({ message: response, redeem_instructions: response2 });
+          });
+        });
+  
+        reqInfo.on("error", (error) => {
+          console.error("Error:", error)
+        });
+  
+        reqInfo.end();
+      });
+    });
+    }else{
+      res.status(400).json({msg: "Insufficient funds. Please topup your wallet"});
+    }
+  
+    reqOrder.on("error", (error) => {
+      next(error);
+    });
+  
+    reqOrder.write(data);
+    reqOrder.end();
+  }).catch(function(err){
+    console.log(err);
+  })
+};
 
 
 
 
 module.exports = {
-    get_started, register, verify, login, forgotten_password, reset_password, get_new_pass,  flutterWallet, flutterPaymentCheck, top_up, electricity_util, electricity_payment, electricity_verification, transfer
+    get_started, register, verify, login, forgotten_password, reset_password, get_new_pass,  flutterWallet, flutterPaymentCheck, top_up, electricity_util, electricity_payment, electricity_verification, transfer, withdraw, getAvailable, orderGiftcard
 }

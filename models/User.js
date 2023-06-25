@@ -25,7 +25,7 @@ const userSchema = new Schema({
     },
     balance: {
         type: Number,
-        default: 00
+        default: 0.00
     },
     password: {
         type: String,
