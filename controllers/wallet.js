@@ -11,11 +11,17 @@ const forgot_pass = require("../middlewares/forgot_pass");
 const Flutterwave = require("flutterwave-node-v3");
 const Transaction = require("../models/transactionRecords");
 const Topup = require("../models/Topup");
-const Electricity = require("../models/Utility");
+const Electricity = require("../models/Electricity");
+const Cable = require("../models/Cable");
+const Complaints = require("../models/Complaints");
 // Payment record model
 const PaymentRecord = require("../models/paymentRecord");
 const Transfer = require("../models/Transfers");
 const Withdrawal = require("../models/Withdrawals");
+const Data = require("../models/Data");
+const data_prices = require("../middlewares/data_prices");
+const electrics = require("../middlewares/electric");
+const cables = require("../middlewares/cables");
 
 // Salt Round Value
 const saltRound = 10;
@@ -570,7 +576,7 @@ const top_up = async function(req, res){
   const reloadly = req.reloadly;
       User.findOne({_id: user}).then(function(user){
           if(user){
-              if(user.balance >= req.body.amount && req.balance >= req.body.amount){
+              if(user.balance >= req.body.amount){
                   req.body.phone = req.body.phone.indexOf(0) == "0" ? req.body.phone.replace("0", "") : req.body.phone;
                   const url = 'https://topups.reloadly.com/operators/auto-detect/phone/' +req.body.phone+ '/countries/NG?suggestedAmounsMap=true&SuggestedAmounts=true';
                   const options = {
@@ -590,6 +596,7 @@ const top_up = async function(req, res){
 
                       resd.on('end', () => {
                         let respol = JSON.parse(respo);
+                        console.log(respol);
                           let operatorId = respol.operatorId;
                           const url = 'https://topups.reloadly.com/topups';
                           const options = {
@@ -698,153 +705,6 @@ const top_up = async function(req, res){
           }
       }).catch(function(err){
           res.status(500).json({msg: "Database Error: Could not get the user details"});
-      })
-}
-
-const electricity_util = async function(req, res){
-  
-  const options = {
-    hostname: 'utilities.reloadly.com',
-    path: '/billers?size=90',
-    method: 'GET',
-    headers: {
-      'Authorization': 'Bearer '+ req.reloadly
-    }
-  };
-
-    const reqv = https.request(options, (resv) => {
-        console.log(`Status Code: ${resv.statusCode}`);
-        let data = "";
-        resv.on('data', (chunk) => {
-          data += chunk;
-        });
-        resv.on('end', () => {
-          let parsed = JSON.parse(data);
-          res.status(200).json({msg: "This is the list of electricity billers in Nigeria", parsed});
-        });
-    });
-
-    reqv.on('error', (error) => {
-        console.error(`Request Error: ${error}`);
-    });
-
-    reqv.end();
-
-}
-
-const electricity_payment = async function(req, res){
-    User.findOne({_id: req.user}).then(function(user){
-      if(user.balance >= req.body.amount){
-        const ref_id = Date.now() + generateRandomString();
-        const data = JSON.stringify({
-          subscriberAccountNumber: req.body.acct_no,
-          amount: req.body.amount,
-          billerId: req.body.biller_id,
-          useLocalAmount: null,
-          referenceId: ref_id
-        });
-        
-        const options = {
-          hostname: 'utilities.reloadly.com',
-          path: '/pay',
-          method: 'POST',
-          headers: {
-            'Accept': 'application/com.reloadly.utilities-v1+json',
-            'Authorization': 'Bearer ' + req.reloadly,
-            'Content-Type': 'application/json',
-            'Content-Length': data.length
-          }
-        };
-        
-        const reqx = https.request(options, (resx) => {
-          console.log(`Status Code: ${resx.statusCode}`);
-          let datum = "";
-          resx.on('data', (chunk) => {
-            datum += chunk;
-          });
-          resx.on('end', () => {
-            let parsed_datum = JSON.parse(datum);
-            console.log(parsed_datum);
-            if(parsed_datum.status == "PROCESSING"){
-                User.findOneAndUpdate({_id: req.user}, {balance: user.balance-req.body.amount}).then(function(){
-                  const electricity = new Electricity({userId: user._id, email: user.email, amount: req.body.amount, reference_id: ref_id, biller_id: req.body.biller_id});
-                  electricity.save().then(function(){
-                    res.status(200).json({msg: "The payment is being processed"});
-                  }).catch(function(err){
-                    console.log(err);
-                  })
-                }).catch(function(err){
-                  console.log(err);
-                })
-            }else{
-              res.status(400).json({msg: "The payment is not successful"});
-            }
-          });
-        });
-        
-        reqx.on('error', (error) => {
-          console.error(`Request Error: ${error}`);
-        });
-        
-        reqx.write(data);
-        reqx.end();
-      }else{
-        res.status(400).json({msg: "Insufficient Funds... Please Fund your wallet"});
-      }
-    }).catch(function(err){
-      console.log(err);
-    })
-  
-}
-
-const electricity_verification = async function(req, res){
-      User.findOne({_id: {$eq: req.user}}).then(function(user){
-        Electricity.findOne({$and: [{userId: {$eq: user._id}}, {reference_id: {$eq: req.body.reference_id}}]}).then(function(details){
-            if(details){
-              const options = {
-                hostname: 'utilities.reloadly.com',
-                path: '/transactions/'+req.body.reference_id,
-                method: 'GET',
-                headers: {
-                  'Accept': 'application/com.reloadly.utilities-v1+json',
-                  'Authorization': 'Bearer ' + req.reloadly
-                }
-              };
-        
-              const reqf = https.request(options, (resf) => {
-                console.log(`Status Code: ${resf.statusCode}`);
-                let datum = "";
-                resf.on('data', (chunk) => {
-                  datum += chunk;
-                });
-                resf.on('end', () => {
-                  let parsed_datum = JSON.parse(datum);
-                  if(parsed_datum.transaction.status == "SUCCESSFUL"){
-                    Electricity.findOneAndUpdate({$and: [{userId: {$eq: user._id}}, {reference_id: {$eq: req.body.reference_id}}]}, {reference_id: "completed"}).then(function(){
-                      res.status(200).json({msg: "The payment is successful", details});
-                    }).catch(function(err){
-                      console.error(err);
-                    })
-                  }else{
-                    res.status(200).json({msg: "The payment is processing", details});
-                  }
-                });
-              });
-        
-              reqf.on('error', (error) => {
-                console.error(`Request Error: ${error}`);
-              });
-        
-              reqf.end();
-        
-            }else{
-              res.status(200).json({msg: "The transaction does not exist"});
-            }
-        }).catch(function(err){
-          console.log(err);
-        })
-      }).catch(function(err){
-        console.log(err);
       })
 }
 
@@ -1056,9 +916,330 @@ const orderGiftcard = function(req, res, next){
   })
 };
 
+const getDataOffers = function(req, res){
+  const user = req.user;
+  const plan = req.body.plan;
+      User.findOne({_id: user}).then(function(user){
+        if(user){
+          res.status(200).json({plans: data_prices});
+        }
+      }).catch(function(err){
+          res.status(500).json({msg: "Database Error: Could not get the user details"});
+      })
+}
+
+const buyData = function(req, res){
+
+
+  const user = req.user;
+  const reloadly = req.reloadly;
+  const plan = req.body.plan;
+      User.findOne({_id: user}).then(function(user){
+        if(user){
+            req.body.phone = req.body.phone.indexOf(0) == "0" ? req.body.phone.replace("0", "") : req.body.phone;
+            const url = 'https://topups.reloadly.com/operators/auto-detect/phone/' +req.body.phone+ '/countries/NG?suggestedAmounsMap=true&SuggestedAmounts=true';
+            const options = {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer '+ reloadly,
+                    'Accept': 'application/com.reloadly.topups-v1+json'
+                }
+            };
+          
+            const reqd = https.request(url, options, (resd) => {
+                let respo = '';
+          
+                resd.on('data', (chunk) => {
+                    respo += chunk;
+                });
+          
+                resd.on('end', () => {
+                  let respol = JSON.parse(respo);
+                  console.log(respol);
+                  let operatorId = respol.operatorId;
+                  const networks = ["mtn", "glo", "airtel", "etisalat"];
+                  const net_id = [341, 344, 342, 340];
+                  console.log(net_id.indexOf(operatorId));
+                  const chosen_network = networks[net_id.indexOf(operatorId)];
+                  const plan_network = data_prices[net_id.indexOf(operatorId)];
+                  console.log(plan_network);
+                  const plan_details = plan_network.filter((plans) => plans.plan == req.body.plan)[0];
+                  const plan_price = plan_details.price;
+                  const plan_text = plan_details.text;
+                  console.log(plan_price);
+                  if(user.balance >= plan_price){
+                    const url = 'https://vtu.ng/wp-json/api/v1/data?username=dwighyxawft&password=Timilehin1.&phone=0'+req.body.phone+'&network_id='+chosen_network+'&variation_id='+req.body.plan+'';
+                    const options = {
+                        method: 'GET',
+                    };
+                    const reqs = https.request(url, options, (ress) => {
+                      let respons = '';
+                  
+                      ress.on('data', (chunk) => {
+                          respons += chunk;
+                      });
+                  
+                      ress.on('end', () => {
+                        let responsd = JSON.parse(respons);
+                        if(responsd.code == "success"){
+                          User.updateOne({user_id: {$eq: req.user}}, {balance: user.balance - plan_price}).then(function(){
+                            const mobile_data = new Data({userId: req.user, email: user.email, phone_number: req.body.phone, amount: plan_price, transaction_id: generateRandomString()});
+                            mobile_data.save().then(function(){
+                              res.status(200).json({msg: plan_text + " has been successfully transferred to your phone number for a total amount of " + plan.price + " from your wallet"})
+                            }).catch(function(err){
+                              console.log(err);
+                            })
+                          }).catch(function(err){
+                            console.log(err)
+                          })
+                        }else{
+                          res.status(400).json({msg: "There is an error in your transaction. Please try again later"});
+                        }
+                      });
+                      });
+                      reqs.on('error', (error) => {
+                        console.error('error:', error);
+                      });
+                  
+                      reqs.end();
+                  }else{
+                    res.status(500).json({msg: "Insufficient Funds. Please fund your wallet"});
+                  }
+                });
+            });
+          
+            reqd.on('error', (error) => {
+            console.error('error:', error);
+            });
+          
+            reqd.end();
+    }
+}).catch(function(err){
+    res.status(500).json({msg: "Database Error: Could not get the user details"});
+})
+  
+
+
+}
+
+const electricity_payment = function(req, res){
+    const user_id = req.user;
+    const {amount, meter, service, type, phone} = req.body;
+    User.findOne({_id: user_id}).then(function(user){
+      if(user){
+            const url = 'https://vtu.ng/wp-json/api/v1/verify-customer?username=dwighyxawft&password=Timilehin1.&customer_id='+meter+'&service_id='+service+'&variation_id='+type+'';
+            const options = {
+                method: 'GET',
+            };
+            const reqs = https.request(url, options, (ress) => {
+              let respons = '';
+          
+              ress.on('data', (chunk) => {
+                  respons += chunk;
+              });
+          
+              ress.on('end', () => {
+                let responsd = JSON.parse(respons);
+                if(responsd.code == "success" && user.balance >= amount){
+                  const url2 = 'https://vtu.ng/wp-json/api/v1/electricity?username=dwighyxawft&password=Timilehin1.&phone='+phone+'&meter_number='+meter+'&service_id='+service+'&variation_id='+type+'&amount='+amount+'';
+                  const options2 = {
+                      method: 'GET',
+                  };
+                  const reqs2 = https.request(url2, options2, (ress2) => {
+                    let respons2 = '';
+                
+                    ress2.on('data', (chunk) => {
+                        respons2 += chunk;
+                    });
+                
+                    ress2.on('end', () => {
+                      let responsd2 = JSON.parse(respons2);
+                      if(responsd2.code == "success"){
+                          User.updateOne({_id: {$eq: req.user}}, {balance: user.balance - amount}).then(function(){
+                            const electricity = new Electricity({userId: req.user, token: responsd2.data.token, amount: amount, reference_id: responsd2.data.order_id, phone: phone, meter: meter, biller_id: service});
+                            electricity.save().then(function(){
+                              res.status(200).json({msg: "Your electricity bill has been successfully paid"});
+                            }).catch(function(err){
+                              console.log(err);
+                            })
+                          }).catch(function(err){
+                            console.log(err);
+                          })
+                      }else{
+                        res.status(400).json({msg: responsd2.message})
+                      }
+                    });
+                    });
+                    reqs2.on('error', (error) => {
+                      console.error('error:', error);
+                    });
+                
+                    reqs2.end();
+                }else{
+                  res.status(400).json({msg: responsd.message})
+                }
+              });
+              });
+              reqs.on('error', (error) => {
+                console.error('error:', error);
+              });
+          
+              reqs.end();
+      }
+    }).catch(function(err){
+      res.status(500).json({msg: "Database Error: Could not get the user details"});
+  })
+}
+
+const electricity_details = function(req, res){
+  const user = req.user;
+  const plan = req.body.plan;
+      User.findOne({_id: user}).then(function(user){
+        if(user){
+          res.status(200).json({electrics: electrics});
+        }
+      }).catch(function(err){
+          res.status(500).json({msg: "Database Error: Could not get the user details"});
+      })
+}
+
+const cable_payment = function(req, res){
+  const user_id = req.user;
+  const {iuc, service, type, phone} = req.body;
+  const cable = ["dstv", "gotv", "startimes"];
+  const chosen_cable = cable.indexOf(service);
+  const cable_plans = chosen_cable >= 0 ? cables[chosen_cable] : false;
+  const plan_details = cable_plans.filter((plans) => plans.plan == type)[0];
+  const plan_price = plan_details.price;
+  const plan_text = plan_details.text;
+  User.findOne({_id: user_id}).then(function(user){
+    if(user){
+          const url = 'https://vtu.ng/wp-json/api/v1/verify-customer?username=dwighyxawft&password=Timilehin1.&customer_id='+iuc+'&service_id='+service+'';
+          const options = {
+              method: 'GET',
+          };
+          const reqs = https.request(url, options, (ress) => {
+            let respons = '';
+        
+            ress.on('data', (chunk) => {
+                respons += chunk;
+            });
+        
+            ress.on('end', () => {
+              let responsd = JSON.parse(respons);
+              if(responsd.code == "success" && user.balance >= plan_price){
+                const url2 = 'https://vtu.ng/wp-json/api/v1/tv?username=dwighyxawft&password=Timilehin1.&phone='+phone+'&service_id='+service+'&smartcard_number='+iuc+'&variation_id='+type+'';
+                const options2 = {
+                    method: 'GET',
+                };
+                const reqs2 = https.request(url2, options2, (ress2) => {
+                  let respons2 = '';
+              
+                  ress2.on('data', (chunk) => {
+                      respons2 += chunk;
+                  });
+              
+                  ress2.on('end', () => {
+                    let responsd2 = JSON.parse(respons2);
+                    if(responsd2.code == "success"){
+                        User.updateOne({_id: {$eq: req.user}}, {balance: user.balance - amount}).then(function(){
+                          const cable = new Cable({userId: req.user, type: plan_text, amount: plan_price, reference_id: responsd2.data.order_id, phone: phone, iuc: iuc, biller_id: service});
+                          electricity.save().then(function(){
+                            res.status(200).json({msg: "Your cable tv bill has been successfully paid"});
+                          }).catch(function(err){
+                            console.log(err);
+                          })
+                        }).catch(function(err){
+                          console.log(err);
+                        })
+                    }else{
+                      res.status(400).json({msg: responsd2.message})
+                    }
+                  });
+                  });
+                  reqs2.on('error', (error) => {
+                    console.error('error:', error);
+                  });
+              
+                  reqs2.end();
+              }else{
+                res.status(400).json({msg: responsd.message})
+              }
+            });
+            });
+            reqs.on('error', (error) => {
+              console.error('error:', error);
+            });
+        
+            reqs.end();
+    }
+  }).catch(function(err){
+    res.status(500).json({msg: "Database Error: Could not get the user details"});
+})
+}
+
+const cable_details = function(req, res){
+  const user = req.user;
+  const plan = req.body.plan;
+      User.findOne({_id: user}).then(function(user){
+        if(user){
+          res.status(200).json({cables: cables});
+        }
+      }).catch(function(err){
+          res.status(500).json({msg: "Database Error: Could not get the user details"});
+      })
+}
+
+const support = function(req, res){
+  const { email, subject, body } = req.body;
+  User.findOne({email: {$eq: email}}).then(function(user){
+    if(user){
+        const complaint = new Complaints({userId: user._id, name: user.name, email: user.email, subject: subject, body: body});
+        complaint.save().then(function(){
+            res.status(200).json({msg: "Your cmplaint has been forwarded. We will respond within 48 hours"});
+        }).catch(function(err){
+          consle.log(err)
+        })
+    }else{
+      res.status(404).json({msg: "This user does not exist"});
+    }
+  }).catch(function(err){
+    consle.log(err)
+  })
+}
+
+const admin_complaints = function(req, res){
+  Complaints.find({}).then(function(complaints){
+      res.status(200).json({complaints});
+  }).catch(function(err){
+    console.log(err);
+  })
+}
+
+
 
 
 
 module.exports = {
-    get_started, register, verify, login, forgotten_password, reset_password, get_new_pass,  flutterWallet, flutterPaymentCheck, top_up, electricity_util, electricity_payment, electricity_verification, transfer, withdraw, getAvailable, orderGiftcard
+    get_started,
+    register,
+    verify,
+    login,
+    forgotten_password,
+    reset_password,
+    get_new_pass,
+    flutterWallet,
+    flutterPaymentCheck,
+    top_up,
+    electricity_details,
+    electricity_payment,
+    transfer,
+    withdraw, 
+    getAvailable, 
+    orderGiftcard, 
+    getDataOffers, 
+    buyData, 
+    cable_details, 
+    cable_payment,
+    support
 }
