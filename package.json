@@ -35,9 +35,8 @@
     "flutterwave-node-v3": "^1.1.5",
     "https": "^1.0.0",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.1.1",
+    "mongoose": "^14.20.1",
     "morgan": "^1.10.0",
-    "node-fetch": "^3.3.1",
     "nodemailer": "^6.9.2",
     "uuid": "^9.0.0"
   },
