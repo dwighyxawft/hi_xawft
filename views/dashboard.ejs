@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - xawftly</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <header>
+        <h1>XAWFTLY</h1>
+        <nav>
+            <ul>
+                <li><a href="/wallet/">Home</a></li>
+                <li><a href="/wallet/features">Features</a></li>
+                <li><a href="/wallet/contact">Contact</a></li>
+                <li><a href="/wallet/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="dashboard">
+        <div class="container">
+            <h2>Welcome, <%= user.username %></h2>
+
+            <div class="profile-section">
+                <img src="/images/users/<%= user.image %>" alt="User Profile Picture" class="profile-picture">
+                <div>
+                    <p><strong>Email:</strong> <%= user.email %></p>
+                    <p><strong>Joined:</strong> <%= user.createdAt %></p>
+                </div>
+            </div>
+
+            <div class="balance">
+                <h3>Your Balance: <%= user.balance %></h3>
+            </div>
+
+            <nav class="dashboard-nav">
+                <ul>
+                    <li><a href="/wallet/settings">Account Settings</a></li>
+                    <li><a href="/wallet/deposit">Deposit</a></li>
+                    <li><a href="/wallet/withdraw">Withdraw</a></li>
+                    <li><a href="/wallet/transfer">Transfer</a></li>
+                </ul>
+            </nav>
+
+            <div class="transaction-history">
+                <h3>Recent Transactions</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(transactions.length > 0){ %>
+                            <% transactions.slice(0,5).forEach(transaction => { %>
+                                <tr>
+                                    <td><%= transaction.createdAt %></td>
+                                    <td><%= transaction.purpose %></td>
+                                    <td><%= transaction.amount %></td>
+                                    <td><%= transaction.status %></td>
+                                </tr>
+                            <% }); %>
+                            
+                        <% }else{ %>
+                            <td colspan="4">No transaction history</td>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="wallet-tips">
+                <h3>Wallet Tips</h3>
+                <p>Managing your finances has never been more critical. In today's digital era, having a secure and organized wallet can save you from potential pitfalls and help you achieve your financial dreams. Here are some things to remember:</p>
+                <ul>
+                    <li><strong>Security:</strong> Always ensure that your password is unique and contains a mix of characters. Avoid using easily guessable passwords.</li>
+                    <li><strong>Review:</strong> Regularly review your transaction history to keep tabs on your spending habits and spot any unauthorized transactions early.</li>
+                    <li><strong>Set Limits:</strong> If possible, set daily transaction limits. It will add an extra layer of security to your wallet.</li>
+                </ul>
+                <p>Remember, the key to a successful financial journey is staying informed and vigilant. Happy transacting!</p>
+            </div>
+
+           
+
+            <div class="transactions">
+                <h3>Quick Transactions</h3>
+                <div class="transaction-btns">
+                    <button onclick="location.href='/wallet/airtime-transaction'">Airtime Transaction</button>
+                    <button onclick="location.href='/wallet/data-transaction'">Data Transaction</button>
+                    <button onclick="location.href='/wallet/utility-billing-transaction'">Utility Billing Transaction</button>
+                    <button onclick="location.href='/wallet/cable-subscription'">Cable Subscriptions</button>
+                    <button onclick="location.href='/wallet/betting-funding'">Betting Funding</button>
+                </div>
+            </div>
+
+            <div class="support">
+                <button onclick="location.href='/wallet/contact'">Need Support?</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 xawftly wallet. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        $(document).ready(function(){
+            $.ajax({
+                url: "/wallet/check-last-deposit",
+                type: "get",
+                dataType: "json",
+                success: function(data){
+                    console.log(data.msg);
+                }
+            })
+        })
+    </script>
+</body>
+</html>

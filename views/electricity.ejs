@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Electricity Payment - xawftly</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/electricity.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/jquery-3.5.1.min.js"></script>
+</head>
+
+<body>
+    <!-- Same header from the dashboard for consistency -->
+    <header>
+        <h1>XAWFTLY</h1>
+        <nav>
+            <ul>
+                <li><a href="/wallet/">Home</a></li>
+                <li><a href="/wallet/features">Features</a></li>
+                <li><a href="/wallet/contact">Contact</a></li>
+                <li><a href="/wallet/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="payment">
+        <div class="container">
+            <h2>Electricity Bill Payment</h2>
+
+            <form id="electricity" method="post">
+                <div class="form-group">
+                    <label for="account-number">Meter Number:</label>
+                    <input type="text" id="account-number" name="meter" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="provider">Electric Service Provider:</label>
+                    <select id="provider" name="service"> 
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="provider">Electric Service Type:</label>
+                    <select id="provider" name="type"> 
+                        <option value="prepaid">Prepaid</option>
+                        <option value="postpaid">Postpaid</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Amount (NGN):</label>
+                    <input type="number" id="amount" name="amount" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Pay Bill" class="btn">
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 xawftly wallet. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        $(document).ready(function(){
+            $.ajax({
+                url: "/wallet/dashboard/billers/electricity",
+                type: "GET",
+                dataType: "json",
+                success: function(data){
+                    data.electrics.forEach(element => {
+                        document.querySelector("#provider").insertAdjacentHTML("afterbegin", `<option value="${element.plan}">${element.text}</option>`);
+                    });
+                }
+            })
+
+            $("#electricity").on("submit", function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: "/wallet/dashboard/payment/electricity",
+                    type: "post",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function(data){
+                        alert(data.msg);
+                    }
+                })
+            })
+            $.ajax({
+                url: "/wallet/check-last-deposit",
+                type: "get",
+                dataType: "json",
+                success: function(data){
+                    console.log(data.msg);
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>

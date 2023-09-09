@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Contact - xawftly</title>
+  <link rel="stylesheet" href="/css/contact.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <header>
+    <h1>XAWFTLY</h1>
+    <nav>
+      <ul>
+        <li><a href="/wallet/">Home</a></li>
+        <li><a href="/wallet/features">Features</a></li>
+        <li><a href="/wallet/contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section id="contact">
+    <div class="container">
+      <h2>Contact Us</h2>
+      <p>Got a question or need assistance? Reach out to us using the form below.</p>
+      
+      <form id="contact">
+        <label for="name">Your Name:</label>
+        <input type="text" id="name" name="name" required>
+        
+        <label for="email">Your Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject" required>
+        
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" required></textarea>
+        
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2023 xawftly wallet. All rights reserved.</p>
+    </div>
+  </footer>
+  <script>
+    $(document).ready(function(){
+      $("#contact").on("submit", function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: "/wallet/support",
+                    type: "post",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function(data){
+                        alert(data.msg);
+                    }
+                })
+            })
+    })
+  </script>
+</body>
+</html>

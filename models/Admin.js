@@ -1,27 +1,26 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const verifyUserSchema = new Schema({
-    user_id: {
+const adminSchema = new Schema({
+    name: {
         type: String,
         required: true
     },
     email: {
         type: String,
         required: true
-
     },
-    uuid: {
+    phone: {
         type: String,
         required: true
     },
-    link: {
+    gender: {
         type: String,
         required: true
     },
-    expires: {
-        type: Date,
-        default: Date.now() + (1000 * 60 * 60 * 24)
-    }
+    password: {
+        type: String,
+        required: true
+    },
 }, {timestamps: true});
-const Verification = mongoose.model("Verification", verifyUserSchema);
-module.exports = Verification;
+const Admin = mongoose.model("Admin", adminSchema);
+module.exports = Admin;

@@ -1,0 +1,94 @@
+/* Reset default margins and paddings */
+body, h1, h2, h3, h4, p, ul, li, form, button {
+    margin: 0;
+    padding: 0;
+}
+
+/* Set default font and background */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+/* Set header styles */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+}
+
+header h1 {
+    margin: 0;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+nav ul li a:hover {
+    background-color: #555;
+}
+
+
+/* Cable Subscription Styles */
+.cable-subscription-form {
+    background-color: #ebebeb;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.cable-subscription-form label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.cable-subscription-form select,
+.cable-subscription-form input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #aaa;
+}
+
+.cable-subscription-form button {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cable-subscription-form button:hover {
+    background-color: #555;
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+  }

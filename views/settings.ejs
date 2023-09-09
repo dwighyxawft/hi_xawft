@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Account Settings - xawftly</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/settings.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <header>
+        <h1>XAWFTLY</h1>
+        <nav>
+            <ul>
+                <li><a href="/wallet/">Home</a></li>
+                <li><a href="/wallet/features">Features</a></li>
+                <li><a href="/wallet/contact">Contact</a></li>
+                <li><a href="/wallet/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="account-settings">
+        <div class="container">
+
+            <!-- Personal Info Section -->
+            <h2>Personal Information</h2>
+            <form id="update-info" method="post">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" value="<%= user.name %>" required>
+                </div>
+                <div class="form-group">
+                    <label for="user-name">Name:</label>
+                    <input type="text" id="user-name" name="username" value="<%= user.username %>" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="<%= user.email %>" required>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Update Info" class="btn">
+                </div>
+            </form>
+
+            <!-- Profile Picture Section -->
+            <h2>Change Profile Picture</h2>
+            <form action="/wallet/update-profile-pic" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input type="file" id="profile-pic" name="profilePic" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Update Picture" class="btn">
+                </div>
+            </form>
+
+            <!-- Password Section -->
+            <h2>Password Settings</h2>
+            <form id="update-password" method="post">
+                <div class="form-group">
+                    <label for="current-password">Current Password:</label>
+                    <input type="password" id="current-password" name="current_pass" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-password">New Password:</label>
+                    <input type="password" id="new-password" name="new_pass" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Confirm New Password:</label>
+                    <input type="password" id="confirm-password" name="confirm_pass" required>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Change Password" class="btn">
+                </div>
+            </form>
+
+            <!-- PIN Settings Section -->
+            <h2>PIN Settings</h2>
+            <form id="update-pin" method="post">
+                <div class="form-group">
+                    <label for="current-pin">Current PIN:</label>
+                    <input type="password" id="current-pin" name="current_pin" maxlength="4" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-pin">New PIN:</label>
+                    <input type="password" id="new-pin" name="new_pin" maxlength="4" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-pin">Confirm New PIN:</label>
+                    <input type="password" id="confirm-pin" name="confirm_pin" maxlength="4" required>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Change PIN" class="btn">
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 xawftly wallet. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        $(document).ready(function(){
+            $("#update-info").on("submit", function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: "/wallet/dashboard/edit-details",
+                    type: "post",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function(data){
+                        alert(data.msg);
+                    }
+                })
+            })
+            $("#update-pin").on("submit", function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: "/wallet/dashboard/change-pin",
+                    type: "post",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function(data){
+                        alert(data.msg);
+                    }
+                })
+            })
+            $("#update-password").on("submit", function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: "/wallet/dashboard/change-password",
+                    type: "post",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function(data){
+                        alert(data.msg);
+                    }
+                })
+            })
+            $.ajax({
+                url: "/wallet/check-last-deposit",
+                type: "get",
+                dataType: "json",
+                success: function(data){
+                    console.log(data.msg);
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,320 @@
+/* General Styles */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  h1, h2, h3, h4 {
+    margin: 0;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  a {
+    text-decoration: none;
+  }
+  
+  /* Header Styles */
+  
+  header {
+    background-color: #333;
+    padding: 20px;
+    color: #fff;
+  }
+  
+  h1 {
+    font-size: 24px;
+    margin: 0;
+  }
+  
+  nav ul {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  nav ul li {
+    margin-left: 10px;
+  }
+  
+  nav ul li a {
+    color: #fff;
+  }
+  
+  /* Hero Section Styles */
+  
+  #hero {
+    background-color: #f2f2f2;
+    padding: 40px 0;
+    text-align: center;
+  }
+  
+  #hero h2 {
+    font-size: 36px;
+  }
+  
+  #hero p {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+  
+  /* Features Section Styles */
+  
+  #features {
+    background-color: #fff;
+    padding: 40px 0;
+    text-align: center;
+  }
+  
+  .feature {
+    margin-bottom: 40px;
+  }
+  
+  .feature img {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
+  }
+  
+  .feature h4 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .feature p {
+    font-size: 16px;
+  }
+  
+  /* Footer Styles */
+  
+  footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+  }
+  
+  /* Register Page Styles */
+  
+  #register {
+    background-color: #f2f2f2;
+    padding: 40px 0;
+  }
+  
+  #register h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    font-size: 18px;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  .pin-inputs {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+  }
+  
+  .pin-inputs input {
+    width: 20%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+
+  label{
+    font-weight: bold;
+  }
+  
+  /* Responsive Styles */
+  
+  @media (max-width: 767px) {
+    section#register{
+        padding-right: 1rem;
+    }
+    /* Styles for Phones */
+    header {
+      padding: 10px;
+    }
+  
+    h1 {
+      font-size: 20px;
+    }
+  
+    #hero h2 {
+      font-size: 28px;
+    }
+  
+    #hero p {
+      font-size: 16px;
+    }
+  
+    .feature img {
+      width: 80px;
+      height: 80px;
+    }
+  
+    .feature h4 {
+      font-size: 20px;
+    }
+  
+    .feature p {
+      font-size: 14px;
+    }
+  
+    footer {
+      padding: 10px 0;
+    }
+  
+    #register h2 {
+      font-size: 28px;
+    }
+  
+    .form-group label {
+      font-size: 16px;
+    }
+  
+    .form-group input,
+    .pin-inputs input {
+      font-size: 14px;
+    }
+
+    .pin-inputs input {
+        margin-right: 0.3rem;
+    }
+  }
+  
+  @media (min-width: 768px) and (max-width: 1023px) {
+    /* Styles for Tablets */
+    header {
+      padding: 15px;
+    }
+  
+    h1 {
+      font-size: 22px;
+    }
+  
+    #hero h2 {
+      font-size: 32px;
+    }
+  
+    #hero p {
+      font-size: 16px;
+    }
+  
+    .feature img {
+      width: 90px;
+      height: 90px;
+    }
+  
+    .feature h4 {
+      font-size: 22px;
+    }
+  
+    .feature p {
+      font-size: 16px;
+    }
+  
+    footer {
+      padding: 15px 0;
+    }
+  
+    #register h2 {
+      font-size: 30px;
+    }
+  
+    .form-group label {
+      font-size: 18px;
+    }
+  
+    .form-group input,
+    .pin-inputs input {
+      font-size: 16px;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    /* Styles for PCs */
+    header {
+      padding: 20px;
+    }
+  
+    h1 {
+      font-size: 24px;
+    }
+  
+    #hero h2 {
+      font-size: 36px;
+    }
+  
+    #hero p {
+      font-size: 18px;
+    }
+  
+    .feature img {
+      width: 100px;
+      height: 100px;
+    }
+  
+    .feature h4 {
+      font-size: 24px;
+    }
+  
+    .feature p {
+      font-size: 16px;
+    }
+  
+    footer {
+      padding: 20px 0;
+    }
+  
+    #register h2 {
+      font-size: 36px;
+    }
+  
+    .form-group label {
+      font-size: 18px;
+    }
+  
+    .form-group input,
+    .pin-inputs input {
+      font-size: 16px;
+    }
+  }
+  

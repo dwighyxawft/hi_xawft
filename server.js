@@ -18,7 +18,9 @@ app.use(morgan("dev"));
 
 
 app.use("/wallet", wallet);
-
+app.use("/", function(req, res){
+    res.redirect("/wallet");
+})
 app.use(function(req, res){
     res.status(404).json({msg: "This route does not exist. Please login and try again"});
 })

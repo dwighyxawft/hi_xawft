@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Buy Data - xawftly</title>
+    <link rel="stylesheet" href="/css/data.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>XAWFTLY</h1>
+        <nav>
+            <ul>
+                <li><a href="/wallet/">Home</a></li>
+                <li><a href="/wallet/features">Features</a></li>
+                <li><a href="/wallet/contact">Contact</a></li>
+                <li><a href="/wallet/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="data-purchase">
+        <div class="container">
+            <h2>Buy Data</h2>
+
+            <form id="topup_data" method="post">
+                <div class="form-group">
+                    <label for="phone-number-data">Phone Number:</label>
+                    <input type="text" id="phone-number-data" name="phone" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="network">Network:</label>
+                    <input type="text" placeholder="Select your network" id="network" name="network" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label for="data-plan">Data Plan:</label>
+                    <select id="data-plan" name="plan" required disabled>
+                        
+                        <!-- Add more data plans as per your service -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit">Purchase</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 xawftly wallet. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        $(document).ready(function(){
+            $("#phone-number-data").on("input", function(e){
+                if(e.target.value.length > 10){
+                    $.ajax({
+                        url: "/wallet/dashboard/get-data-network",
+                        type: "POST",
+                        data: {phone: $(this).val()},
+                        dataType: "json",
+                        success: function(data){
+                            $("#network").val(data.chosen_network.toUpperCase());
+                            $("#data-plan").removeAttr("disabled");
+                            document.querySelector("#data-plan").innerHTML = "";
+                            data.plan_network.forEach(element => {
+                                document.querySelector("#data-plan").insertAdjacentHTML("afterbegin", `<option value="${element.plan}">${element.text} @ ${element.price}</option>`);
+                            });
+                        }
+                    })
+                }
+            })
+            $("#topup_data").on("submit", function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: "/wallet/dashboard/buy/data",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function(data){
+                        alert(data.msg);
+                    }
+                })
+            })
+            $.ajax({
+                url: "/wallet/check-last-deposit",
+                type: "get",
+                dataType: "json",
+                success: function(data){
+                    console.log(data.msg);
+                }
+            })
+        })
+    </script>
+</body>
+</html>

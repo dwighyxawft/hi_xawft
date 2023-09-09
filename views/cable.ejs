@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cable TV Subscription - xawftly</title>
+    <link rel="stylesheet" href="/css/cable.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/js/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>XAWFTLY</h1>
+        <nav>
+            <ul>
+                <li><a href="/wallet/">Home</a></li>
+                <li><a href="/wallet/features">Features</a></li>
+                <li><a href="/wallet/contact">Contact</a></li>
+                <li><a href="/wallet/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="dashboard">
+        <div class="container">
+            <h2>Cable TV Subscription</h2>
+
+            <!-- Cable TV Subscription Form -->
+            <div class="cable-subscription-form">
+                <form id="subscription" method="post">
+                    <label for="cableProvider">IUC Number:</label>
+                    <input type="text" id="cableProvider" name="iuc" placeholder="Enter your IUC Number" required>
+
+
+                    <label for="subscriptionPlan">Select Subscription Service:</label>
+                    <select name="service" id="subscriptionPlan" required>
+                        <option value="nope">Select your service</option>
+                        <option value="dstv">DSTV</option>
+                        <option value="gotv">GOTV</option>
+                        <option value="startimes">STARTIMES</option>
+                    </select>
+
+                    <label for="cardNumber">Select Subscription Plan:</label>
+                    <select name="type" id="cardNumber" required>
+                    </select>
+
+                    <label for="expiryDate">Phone Number:</label>
+                    <input type="tel" id="expiryDate" name="phone" placeholder="081111111" required>
+
+
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 xawftly wallet. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        $(document).ready(function(){
+            $("#subscriptionPlan").on("change", function(e){
+                $.ajax({
+                    url: "/wallet/dashboard/get-cable-network",
+                    type: "POST",
+                    data: {service: $(this).val()},
+                    dataType: "json",
+                    success: function(data){
+                        if(data.plans.length > 0){
+                            document.querySelector("#cardNumber").innerHTML = "";
+                            data.plans.forEach(element => {
+                                document.querySelector("#cardNumber").insertAdjacentHTML("afterbegin", `<option value="${element.plan}">${element.text} @ ${element.price}</option>`);
+                            });
+                        }else{
+                            document.querySelector("#cardNumber").innerHTML = "";
+                            document.querySelector("#cardNumber").innerHTML = data.plans;
+                        }
+                    }
+                })
+            })
+            $("#subscription").on("submit", function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: "/wallet/dashboard/payment/cables",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function(data){
+                        alert(data.msg);
+                    }
+                })
+            })
+            $.ajax({
+                url: "/wallet/check-last-deposit",
+                type: "get",
+                dataType: "json",
+                success: function(data){
+                    console.log(data.msg);
+                }
+            })
+        })
+    </script>
+</body>
+</html>

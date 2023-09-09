@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Transfer to Banks - xawftly</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/bank_transfer.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <script src="/js/jquery-3.5.1.min.js"></script>
+    <script src="/js/popper2.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <!-- Retaining the same header from the dashboard for consistency -->
+    <header>
+        <h1>XAWFTLY</h1>
+        <nav>
+            <ul>
+                <li><a href="/wallet/">Home</a></li>
+                <li><a href="/wallet/features">Features</a></li>
+                <li><a href="/wallet/contact">Contact</a></li>
+                <li><a href="/wallet/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="bank-transfer">
+        <div class="container">
+            <h2>Transfer to Other Banks</h2>
+
+            <form id="transfer" method="post">
+                <div class="form-group">
+                    <label for="bank-name">Bank Name:</label>
+                    <select id="bank-name" name="code">
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="account-number">Account Number:</label>
+                    <input type="text" id="account-number" name="acct" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="account-name">Account Number:</label>
+                    <input type="text" id="account-name" name="acct_name" disabled required>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Amount (USD):</label>
+                    <input type="number" id="amount" name="amount" min="100" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="note">Note (optional):</label>
+                    <textarea id="note" name="narration" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Transfer Funds" class="btn">
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 xawftly wallet. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        $(document).ready(function(){
+            $.ajax({
+                url: "/wallet/dashboard/fetch_banks",
+                type: "get",
+                dataType: "json",
+                success: function(info){
+                    info.response.forEach(element => {
+                        document.querySelector("#bank-name").insertAdjacentHTML("afterbegin", `<option value="${element.cbn_code}">${element.bank_name.toUpperCase()}</option>`);
+                    });
+                }
+            });
+            $("#account-number").on("input", function(e){
+                if($(this).val().length == 10){
+                    e.preventDefault();
+                    $.ajax({
+                        url: "/wallet/dashboard/verify-bank-details",
+                        type: "POST",
+                        data: $(this).serialize(),
+                        dataType: "json",
+                        success: function(data){
+                            if(data.response){
+                                $("#account-name").val(`${data.response.account_name.toUpperCase()}`);
+                            }
+                        },
+                        error: function(xhr, status, error){
+                            console.log("AJAX Error:", error);
+                        }
+                    })
+                }
+            })
+            $("#transfer").on("submit", function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: "/wallet/dashboard/bank-transfer",
+                    type: "post",
+                    data: $(this).serialize(),
+                    dataType: "json",
+                    success: function(data){
+                        alert(data.msg);
+                    }
+                })
+            })
+            $.ajax({
+                url: "/wallet/check-last-deposit",
+                type: "get",
+                dataType: "json",
+                success: function(data){
+                    console.log(data.msg);
+                }
+            })
+        })
+    </script>
+</body>
+
+</html>

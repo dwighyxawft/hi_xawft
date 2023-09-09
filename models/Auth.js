@@ -3,7 +3,11 @@ const Schema = mongoose.Schema;
 const authSchema = new Schema({
     user_id: {
         type: String,
-        required: true
+        default: ""
+    },
+    admin_id: {
+        type: String,
+        default: ""
     },
     access: {
         type: String,

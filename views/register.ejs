@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register - xawftly</title>
+  <link rel="stylesheet" href="/css/register.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="/js/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>XAWFTLY</h1>
+    <nav>
+      <ul>
+        <li><a href="/wallet/">Home</a></li>
+        <li><a href="/wallet/features">Features</a></li>
+        <li><a href="/wallet/contact">Contact</a></li>
+        <li><a href="/wallet/login">Login</a></li>
+            <li><a href="/wallet/register">Signup</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section id="register">
+    <div class="container">
+      <h2>Create an Account</h2>
+      <form id="registration">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" required>
+        </div>
+        <div class="form-group">
+          <label for="pin">PIN</label>
+          <div class="pin-inputs">
+            <input type="password" id="pin1" name="pin1" maxlength="1" required>
+            <input type="password" id="pin2" name="pin2" maxlength="1" required>
+            <input type="password" id="pin3" name="pin3" maxlength="1" required>
+            <input type="password" id="pin4" name="pin4" maxlength="1" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+          <label for="confirm_password">Confirm Password</label>
+          <input type="password" id="confirm_password" name="confirm_password" required>
+        </div>
+        <div class="form-group">
+          <label for="referrer_id">Referrer ID</label>
+          <input type="text" id="referrer_id" name="referrer_id" placeholder="Optional">
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Register" class="btn">
+        </div>
+      </form>
+      <p>Already have an account? <a href="/wallet/login">Login</a></p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2023 xawftly wallet. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    $(document).ready(function(){
+      $("form#registration").on("submit", function(e){
+        e.preventDefault();
+        $.ajax({
+          url: "/wallet/register",
+          type: "post",
+          data: $(this).serialize(),
+          dataType: "json",
+          success: function(data){
+            if(data.code == "error"){
+              alert(data.msg)
+            }else{
+              location.href = "/wallet/login"
+            }
+          }
+        })
+      })
+    })
+  </script>
+</body>
+</html>

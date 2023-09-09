@@ -10,7 +10,7 @@ const withdrawSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    account_bank: {
+    bank_code: {
       type: String,
       required: true
     },
@@ -18,13 +18,21 @@ const withdrawSchema = new mongoose.Schema(
       type: String,
       required: true,
     }, 
-    reference_code: {
+    transaction_id: {
       type: String, 
       required: true
     },
     account_number: {
         type: String, 
         required: true
+    },
+    status: {
+      type: String,
+      required: true
+    },
+    narration: {
+      type: String,
+      required: true
     }
   },
   {

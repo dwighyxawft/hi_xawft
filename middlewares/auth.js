@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const Auth = require("../models/Auth");
 const https = require("https");
 require("dotenv").config();
 
@@ -103,50 +102,50 @@ reqr.end();
 
 }
 
-const gift_token = async function(req, res, next){
+const sagecloud_token = async function(req, res, next){
+const data = JSON.stringify({
+  email: 'amuoladipupo@gmail.com',
+  password: 'Timilehin1.'
+});
 
-  const url = 'https://auth.reloadly.com/oauth/token';
-  const options = {
-    hostname: 'auth.reloadly.com',
-    path: '/oauth/token',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-  };
+const options = {
+  hostname: 'sagecloud.ng',
+  path: '/api/v2/merchant/authorization',
+  method: 'POST',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'Content-Length': data.length
+  }
+};
 
-  const data = JSON.stringify({
-    client_id: 'gGH988E5zNGJehdI5nBNDYvoxbD0SdfA',
-    client_secret: '4BMeIbHxMM-5ZwP2fYKyCc91F5hU0s-nmfrJWT8q9t9np59CrgXWFBrdw3XcGc8',
-    grant_type: 'client_credentials',
-    audience: 'https://giftcards.reloadly.com',
+const reqr = https.request(options, (resr) => {
+  let responseData = '';
+
+  resr.on('data', (chunk) => {
+    responseData += chunk;
   });
 
-  const reqr = https.request(url, options, (resr) => {
-    let responseData = '';
-
-    resr.on('data', (chunk) => {
-      responseData += chunk;
-    });
-
-    resr.on('end', () => {
-      const initial = JSON.parse(responseData);
-      req.reloadly = initial.access_token;
+  resr.on('end', () => {
+    const response = JSON.parse(responseData);
+    if(response.success){
+      req.sagecloud = response.data.token.access_token;
       next();
-    });
+    }else{
+      res.status(400).json({msg: "Authentication failed"});
+    }
   });
+});
 
-  reqr.on('error', (err) => {
-    console.error('error: ' + err);
-  });
+reqr.on('error', (error) => {
+  console.error(error);
+});
 
-  reqr.write(data);
-  reqr.end();
+reqr.write(data);
+reqr.end();
 
 }
 
-
 module.exports = {
-    authenticateToken, topup_token, util_token, gift_token
+    authenticateToken, topup_token, util_token, sagecloud_token
 }

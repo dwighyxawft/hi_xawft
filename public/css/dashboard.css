@@ -1,0 +1,195 @@
+/* Reset default margins and paddings */
+body, h1, h2, h3, h4, p, ul, li, form, button {
+    margin: 0;
+    padding: 0;
+}
+
+/* Set default font and background */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+/* Set header styles */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+}
+
+header h1 {
+    margin: 0;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+nav ul li a:hover {
+    background-color: #555;
+}
+
+/* Dashboard specific styles */
+#dashboard {
+    background-color: #fff;
+    padding: 20px 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-picture {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.balance, .wallet-tips, .transaction-history {
+    background-color: #ebebeb;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.balance h3, .wallet-tips h3, .transaction-history h3 {
+    margin-top: 0;
+    font-weight: bold;
+    border-bottom: 2px solid #0077cc;
+    padding-bottom: 10px;
+}
+
+.transaction-history table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transaction-history th, .transaction-history td {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+}
+
+.transaction-history th {
+    background-color: #333;
+    color: #fff;
+}
+
+.dashboard-nav ul {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.dashboard-nav li a {
+    display: block;
+    padding: 10px 15px;
+    background-color: #333;
+    color: #fff;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.dashboard-nav li a:hover {
+    background-color: #555;
+}
+
+.wallet-tips ul {
+    list-style: disc;
+    padding-left: 20px;
+}
+
+.wallet-tips li {
+    margin-bottom: 10px;
+}
+
+.transaction-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.transaction-btns button {
+    padding: 10px 15px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.transaction-btns button:hover {
+    background-color: #555;
+}
+
+.support {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.support button {
+    padding: 10px 20px;
+    background-color: #f40;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.support button:hover {
+    background-color: #d30;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .profile-section {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .transaction-btns {
+        flex-direction: column;
+    }
+
+    .transaction-btns button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+  }
+
