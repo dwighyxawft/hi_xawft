@@ -313,8 +313,8 @@ const settings_redirect = function(req, res){
   })
 }
 
-const register = function(req, res){
-        User.findOne({ email: req.body.email}).then(function(existing){
+const register = async function(req, res){
+        await User.findOne({ email: req.body.email}).then(function(existing){
           const uniqueString = uuidv4();
             if(!existing){
                 if(req.body.password == req.body.confirm_password){
@@ -328,10 +328,12 @@ const register = function(req, res){
                       const user = new User({name: req.body.name, username: req.body.username, email: req.body.email, phone: req.body.phone, pin: req.body.pin, gender: req.body.gender, image: req.body.image, password: req.body.password, referrer: req.body.referrer});
                       user.save().then(function(){
                             let verifyUser = new Verification({user_id: user._id, email: user.email, link: "https://xawftly.onrender.com/wallet/"+user._id+"/"+uniqueString+"/", uuid: uniqueString});
-                            verifyUser.save().then(function(){
+                            verifyUser.save().then(async function(){
                               let transport = mail();
-                              transport.sendMail(verifyEmail("https://xawftly.onrender.com/wallet/", user.email, user._id, uniqueString));
-                              res.status(200).json({code: "success", msg: "The user has been registered successfully, A registration link has been sent to your email", user})
+                              const info = await transport.sendMail(verifyEmail("https://xawftly.onrender.com/wallet/", user.email, user._id, uniqueString));
+                              if(info){
+                                res.status(200).json({code: "success", msg: "The user has been registered successfully, A registration link has been sent to your email", user})
+                              }
                             }).catch(function(error){
                               res.status(500).json({code: "error", msg: "Database Error: Could not save verification details"});
                             })
