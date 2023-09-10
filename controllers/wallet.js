@@ -324,10 +324,10 @@ const register = function(req, res){
                       req.body.pin = pin_hash;
                       req.body.image = req.body.gender == "male" ? "image.jpg" : "female.jpg";
                       req.body.password = hash;
-                      console.log("No user");
-                      const user = new User(req.body);
+                      
+                      const user = new User({name: req.body.name, username: req.body.username, email: req.body.email, phone: req.body.phone, pin: req.body.pin, gender: req.body.gender, image: req.body.image, password: req.body.password, referrer: req.body.referrer});
                       user.save().then(function(){
-                            let verifyUser = new Verification({user_id: user._id, email: user.email, link: "https://xawftly.onrender.com/wallet/"+user._id+"/"+uniqueString+"/"});
+                            let verifyUser = new Verification({user_id: user._id, email: user.email, link: "https://xawftly.onrender.com/wallet/"+user._id+"/"+uniqueString+"/", uuid: uniqueString});
                             verifyUser.save().then(function(){
                               let transport = mail();
                               transport.sendMail(verifyEmail("https://xawftly.onrender.com/wallet/", user.email, user._id, uniqueString));
@@ -353,7 +353,7 @@ const register = function(req, res){
                         if(verify){
                             if(verify.expires <= Date.now()){
                                 Verification.deleteOne({$and: [{user_id: {$eq: existing._id}}, {email: {$eq: existing.email}}]}).then(function(){
-                                    let verifyUser = new Verification({user_id: existing._id, email: existing.email, link: "https://xawftly.onrender.com/wallet/"+existing._id+"/"+uniqueString+"/"});
+                                    let verifyUser = new Verification({user_id: existing._id, email: existing.email, link: "https://xawftly.onrender.com/wallet/"+existing._id+"/"+uniqueString+"/", uuid: uniqueString});
                                     verifyUser.save().then(function(){
                                         let transport = mail();
                                         transport.sendMail(verifyEmail("https://xawftly.onrender.com/wallet/", existing.email, existing._id, uniqueString));

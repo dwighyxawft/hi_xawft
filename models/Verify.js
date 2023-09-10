@@ -8,7 +8,6 @@ const verifyUserSchema = new Schema({
     email: {
         type: String,
         required: true
-
     },
     uuid: {
         type: String,
