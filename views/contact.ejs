@@ -22,7 +22,7 @@
       <h2>Contact Us</h2>
       <p>Got a question or need assistance? Reach out to us using the form below.</p>
       
-      <form id="contact">
+      <form id="contact-form">
         <label for="name">Your Name:</label>
         <input type="text" id="name" name="name" required>
         
@@ -47,7 +47,7 @@
   </footer>
   <script>
     $(document).ready(function(){
-      $("#contact").on("submit", function(e){
+      $("#contact-form").on("submit", function(e){
                 e.preventDefault();
                 $.ajax({
                     url: "/wallet/support",
