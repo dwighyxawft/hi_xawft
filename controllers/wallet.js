@@ -314,15 +314,17 @@ const settings_redirect = function(req, res){
 }
 
 const register = function(req, res){
-        User.findOne({ email: {$eq: req.body.email}}).then(function(existing){
+        User.findOne({ email: req.body.email}).then(function(existing){
           const uniqueString = uuidv4();
             if(!existing){
                 if(req.body.password == req.body.confirm_password){
+                  req.body.pin = req.body.pin1 + req.body.pin2 + req.body.pin3 + req.body.pin4;
                   bcrypt.hash(req.body.password, 10).then(function(hash){
                     bcrypt.hash(req.body.pin, 10).then(function(pin_hash){
                       req.body.pin = pin_hash;
                       req.body.image = req.body.gender == "male" ? "image.jpg" : "female.jpg";
                       req.body.password = hash;
+                      console.log("No user");
                       const user = new User(req.body);
                       user.save().then(function(){
                             let verifyUser = new Verification({user_id: user._id, email: user.email, link: "https://xawftly.onrender.com/wallet/"+user._id+"/"+uniqueString+"/"});
@@ -337,7 +339,7 @@ const register = function(req, res){
                           res.status(500).json({code: "error", msg: "Database Error: Could not save user details"});
                       })
                     }).catch(function(err){
-                        res.status(500).json({code: "error", msg: "Server Error: Error hashing the password"});
+                        res.status(500).json({code: "error", msg: "Server Error: Error hashing the pin"});
                     })
                   }).catch(function(err){
                       res.status(500).json({code: "error", msg: "Server Error: Error hashing the password"});
@@ -367,7 +369,7 @@ const register = function(req, res){
                     res.status(200).json({code: "error", msg: "This user already exists", existing});
                 }
             }
-        })
+        }).catch(err=>console.error(err));
 
 }
 
