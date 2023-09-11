@@ -32,6 +32,7 @@ router.get("/admin/settings", auth.authenticateToken, controllers.admin_settings
 router.get("/admin/logout", auth.authenticateToken, controllers.admin_logout);
 router.get("/admin/add-admin", auth.authenticateToken, controllers.add_admin_redirect);
 router.get("/admin/send-email", auth.authenticateToken, controllers.admin_send_mail);
+router.get("/admin/searches", auth.authenticateToken, controllers.admin_search);
 
 
 

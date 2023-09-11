@@ -50,7 +50,7 @@
                         complaints.forEach(function(complaint){
                                 %>
                             <div class="col-md-3">
-                                <a href="/complaints/details/<%= complaint._id %>" style="text-decoration: none;" class="text-dark text-decoration-none">
+                                <a href="/wallet/complaints/details/<%= complaint._id %>" style="text-decoration: none;" class="text-dark text-decoration-none">
                                     <div class="card mb-4">
                                         <div class="card-header">
                                             <strong>Name: </strong> <%= complaint.name %> <!-- This will be dynamic -->
@@ -81,13 +81,13 @@
                     const total = Number(numbers);
                     const avg = Math.ceil(total/16);
                     var start = 0;
-                    for(var i = 0; i<=avg;i++){
-                        if(i == 0){
-                            start = 0;
+                    for(var i = 1; i<=avg;i++){
+                        if(i == 1){
+                            start = 1;
                         }else{
                             start+=17;
                         }%>
-                        <li class="page-item"><a href="/wallet/admin/dashboard/<%= start %>" class="page-link"><%= i+1 %></a></li>
+                        <li class="page-item"><a href="/wallet/admin/dashboard/<%= start %>" class="page-link"><%= i %></a></li>
                     <%}
                     %>
                 </ul>

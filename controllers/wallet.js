@@ -307,7 +307,7 @@ const dashboard = function(req, res){
   const user_id = req.user;
   User.findOne({_id: user_id}).then(function(user){
     if(user){
-      Transaction.find({userId: user_id}).then(function(transactions){
+      Transaction.find({userId: user_id}).limit(10).sort({_id: -1}).then(function(transactions){
         if(transactions){
           res.render("dashboard", {user: user, transactions});
         }
@@ -2110,9 +2110,9 @@ const admin_send_mail = function(req, res){
 }
 
 const admin_complaint = function(req, res){
-  const id = req.param.id
+  const id = req.param.id;
   Complaints.findOne({_id: id}).then(function(complaint){
-    res.render("complaint_details", {complaint});
+    res.render("complaint_details", {complaint: complaint});
   }).catch(function(err){
     console.log(err);
   })
@@ -2217,6 +2217,10 @@ const admin_logout = function(req, res){
   }).catch(err=>console.error(err));
 }
 
+const admin_search = function(req, res){
+  res.render("admin_searches");
+}
+
 
 
 
@@ -2286,5 +2290,6 @@ module.exports = {
     logout,
     admin_logout, 
     add_admin_redirect,
-    admin_send_mail
+    admin_send_mail,
+    admin_search
 }
