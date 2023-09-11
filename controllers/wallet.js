@@ -448,8 +448,8 @@ const register = async function(req, res){
 }
 
 const verify = function(req, res){
-    const id = req.param.id;
-    const uuid = req.param.uuid;
+    const id = req.params.id;
+    const uuid = req.params.uuid;
     Verification.findOne({$and: [{ user_id: {$eq: id}}, {uuid : {$eq: uuid}}]}).then(function(details){
         if(details){
             if(details.expires <= Date.now()){
@@ -2110,9 +2110,13 @@ const admin_send_mail = function(req, res){
 }
 
 const admin_complaint = function(req, res){
-  const id = req.param.id;
-  Complaints.findOne({_id: id}).then(function(complaint){
-    res.render("complaint_details", {complaint: complaint});
+  const id = req.params.id;
+  Complaints.findOne({_id: {$eq: id}}).then(function(complaint){
+    if(complaint){s
+      res.render("complaint_details", {complaint: complaint});
+    }else{
+      res.redirect("/admin/dashboard/1");
+    }
   }).catch(function(err){
     console.log(err);
   })
