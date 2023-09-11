@@ -50,7 +50,7 @@
                         complaints.forEach(function(complaint){
                                 %>
                             <div class="col-md-3">
-                                <a href="/complaints/detail/<%= complaint._id %>">
+                                <a href="/complaints/details/<%= complaint._id %>" style="text-decoration: none;" class="text-dark text-decoration-none">
                                     <div class="card mb-4">
                                         <div class="card-header">
                                             <strong>Name: </strong> <%= complaint.name %> <!-- This will be dynamic -->

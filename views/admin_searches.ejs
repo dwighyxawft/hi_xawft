@@ -47,6 +47,21 @@
         </form>
     </section>
 
+    <section id="send-mail-section" class="mb-4">
+        <h2>Send Email</h2>
+        <form id="send-email" method="post">
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" name="email" class="form-control" placeholder="Enter the registered account email here" required>
+            </div>
+            <div class="form-group">
+                <label>Email Body</label>
+                <textarea name="mail" id="mail" cols="30" rows="10" class="form-control"></textarea>
+            </div>
+            <button type="submit" class="btn btn-secondary">Send Mail</button>
+        </form>
+    </section>
+
 
 
     <!-- Include Bootstrap JS and jQuery -->
@@ -91,6 +106,22 @@
                         alert("User deposit successful")
                     }else{
                         alert("User deposit pending")
+                    }
+                }
+            })
+            })
+            $("#send-email").on("submit", function(e){
+                e.preventDefault();
+                $.ajax({
+                url: "/wallet/admin/send-mail",
+                type: "post",
+                data: $(this).serialize(),
+                dataType: "json",
+                success: function(data){
+                    if(data.status){
+                        alert("Email sent successfully")
+                    }else{
+                        alert("Email failed")
                     }
                 }
             })

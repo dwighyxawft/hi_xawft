@@ -46,7 +46,7 @@ function verifyEmail(currentUrl, email, _id, uniqueString){
     return {
         from: "amuoladipupo420@gmail.com",
         to: email,
-        subject: "Verify your email",
+        subject: "Verify your email from xawftly",
         html: `
         <html lang="en">
         <head>
@@ -98,7 +98,7 @@ function verifyEmail(currentUrl, email, _id, uniqueString){
                 }
             </style>
             <div class="container">
-                <h1>Email Verification</h1>
+                <h1>Xawftly Email Verification</h1>
                 <p>Verify your email address to complete your signup and login to your account</p>
                 <p>This link <strong>expires in 6 hours</strong>.</p>
                 <p>Click the link below to proceed:</p>
@@ -174,6 +174,78 @@ function tmp_feedback(name, email){
             <p>Please rest assured that our team will review the details of your complaint and take appropriate action. You can expect an update from us within [XX hours/days].</p>
             <p>Thank you for bringing this to our attention. Your feedback helps us serve you better.</p>
             <p>Kind Regards,<br>Your Company Name</p>
+        </div>
+        <div class="footer">
+            © 2023 xawftly. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>
+`
+  }
+}  
+
+function admin_feedback(name, email, body){
+  return {
+      from: "amuoladipupo420@gmail.com",
+      to: email,
+      subject: "Response from xawftly",
+      html: `
+      <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 20px 40px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .logo {
+            max-width: 150px;
+            margin-bottom: 15px;
+        }
+
+        .content {
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://github.com/dwighyxawft/mybank/blob/main/images/logos_bg/polaris.jpg" alt="xawft Logo" class="logo">
+            <h2>We're Sorry!</h2>
+        </div>
+        <div class="content">
+            <p>Dear ${name},</p>
+            <p>${body},</p>
+            <p>Kind Regards,<br>xawftly wallet</p>
         </div>
         <div class="footer">
             © 2023 xawftly. All rights reserved.
@@ -356,9 +428,9 @@ const register = async function(req, res){
                             if(verify.expires <= Date.now()){
                                 Verification.deleteOne({$and: [{user_id: {$eq: existing._id}}, {email: {$eq: existing.email}}]}).then(function(){
                                     let verifyUser = new Verification({user_id: existing._id, email: existing.email, link: "https://xawftly.onrender.com/wallet/"+existing._id+"/"+uniqueString+"/", uuid: uniqueString});
-                                    verifyUser.save().then(function(){
+                                    verifyUser.save().then(async function(){
                                         let transport = mail();
-                                        transport.sendMail(verifyEmail("https://xawftly.onrender.com/wallet/", existing.email, existing._id, uniqueString));
+                                        await transport.sendMail(verifyEmail("https://xawftly.onrender.com/wallet/", existing.email, existing._id, uniqueString));
                                         res.status(200).json({code: "error", msg: "This user already exists, A registration link will be sent to your email"})
                                     })
                                 })
@@ -376,8 +448,8 @@ const register = async function(req, res){
 }
 
 const verify = function(req, res){
-    const id = req.params.id;
-    const uuid = req.params.uuid;
+    const id = req.param.id;
+    const uuid = req.param.uuid;
     Verification.findOne({$and: [{ user_id: {$eq: id}}, {uuid : {$eq: uuid}}]}).then(function(details){
         if(details){
             if(details.expires <= Date.now()){
@@ -475,7 +547,7 @@ const forgotten_password = function (req, res) {
       if (user) {
         let id = user._id;
         let email = user.email;
-        if (forgot_pass.send(id, email)) {
+        if ( forgot_pass.send(id, email)) {
           res
             .status(200)
             .json({ msg: "A link has been sent to your email account", id });
@@ -491,8 +563,8 @@ const forgotten_password = function (req, res) {
 };
 
 const reset_password = function (req, res) {
-    let id = req.params.id;
-    let u_str = req.params.u_str;
+    let id = req.param.id;
+    let u_str = req.param.u_str;
     Forgot.findOne({
       $and: [{ user_id: { $eq: id } }, { u_uid: { $eq: u_str } }],
     }).then((forgot) => {
@@ -1912,13 +1984,13 @@ const change_pin = function(req, res){
 }
 
 const support = function(req, res){
-  const { name, email, subject, body } = req.body;
+  const { name, email, subject, message } = req.body;
   User.findOne({email: {$eq: email}}).then(function(user){
     if(user){
         const complaint = new Complaints({ userId: user._id, name: name, email: email, subject: subject, body: body});
-        complaint.save().then(function(){
+        complaint.save().then(async function(){
             let transport = mail();
-            transport.sendMail(tmp_feedback(name, email));
+            await transport.sendMail(tmp_feedback(name, email));
             res.status(200).json({msg: "Your complaint has been forwarded. We will respond within 48 hours"});
         }).catch(function(err){
           console.log(err)
@@ -2012,10 +2084,10 @@ const admin_login = function(req, res){
 }
 
 const admin_complaints = function(req, res){
-    const start = Number(req.params.start);
-    Complaints.find({}).skip(start).limit(16).then(function(complaints){
+    const start = Number(req.param.start);
+    Complaints.find().skip(start).limit(16).then(function(complaints){
       Complaints.find().then(function(numbers){
-        res.render("admin_dashboard", {complaints, numbers});
+        res.render("admin_dashboard", {complaints, numbers: numbers.length});
       }).catch(function(err){
         console.log(err);
       })
@@ -2024,8 +2096,21 @@ const admin_complaints = function(req, res){
     })
 }
 
+const admin_send_mail = function(req, res){
+  const {email, mail} = req.body;
+    User.findOne({email: email}).then(async function(user){
+      if(user){
+        let transport = mail();
+        await transport.sendMail(admin_feedback(user.name, email, mail));
+        res.status(200).json({status: true, msg: "Email sent successfully"});
+      }else{
+        res.status(200).json({status: false, msg: "User not registered"});
+      }
+    })
+}
+
 const admin_complaint = function(req, res){
-  const id = req.params.id
+  const id = req.param.id
   Complaints.findOne({_id: id}).then(function(complaint){
     res.render("complaint_details", {complaint});
   }).catch(function(err){
@@ -2201,4 +2286,5 @@ module.exports = {
     logout,
     admin_logout, 
     add_admin_redirect,
+    admin_send_mail
 }
