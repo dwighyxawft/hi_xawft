@@ -2111,7 +2111,7 @@ const admin_send_mail = function(req, res){
 
 const admin_complaint = function(req, res){
   const id = req.params.id;
-  Complaints.findOne({_id: {$eq: id}}).then(function(complaint){
+  Complaints.findOne({_id: id}).then(function(complaint){
     if(complaint){s
       res.render("complaint_details", {complaint: complaint});
     }else{
