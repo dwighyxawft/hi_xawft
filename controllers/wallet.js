@@ -102,9 +102,9 @@ function verifyEmail(currentUrl, email, _id, uniqueString){
                 <p>Verify your email address to complete your signup and login to your account</p>
                 <p>This link <strong>expires in 6 hours</strong>.</p>
                 <p>Click the link below to proceed:</p>
-                <a href="${currentUrl + 'wallet/verify/' + _id + '/'+ uniqueString + '/'}" class="button">Verify Email Address</a>
+                <a href="${currentUrl}verify/${_id}/${uniqueString}/" class="button">Verify Email Address</a>
                 <p style="margin-top: 20px">You can also copy and paste the following link in your browser</p>
-                <p style="margin-top: 10px;"><a href="${currentUrl + 'verify/' + _id}">Verify Email Address</a></p>
+                <p style="margin-top: 10px;"><a href="${currentUrl}verify/${_id}/${uniqueString}/">Verify Email Address</a></p>
             </div>
         </body>
         </html>`
@@ -459,7 +459,7 @@ const verify = function(req, res){
                     res.status(500).json({msg: "Database Error: Verification details could not be deleted"});
                 })
             }else{
-                User.updateOne({_id: {$eq: id}}, {verified: true}).then(function(){
+                User.updateOne({_id: id}, {verified: true}).then(function(){
                     Verification.deleteOne({ user_id: {$eq: id}}).then(function(){
                       res.render("verification", {status: true})
                     }).catch(function(err){
@@ -2109,10 +2109,10 @@ const admin_send_mail = function(req, res){
     })
 }
 
-const admin_complaint = function(req, res){
+const admin_complaint = function(req, res){e
   const id = req.params.id;
   Complaints.findOne({_id: id}).then(function(complaint){
-    if(complaint){s
+    if(complaint){
       res.render("complaint_details", {complaint: complaint});
     }else{
       res.redirect("/admin/dashboard/1");
