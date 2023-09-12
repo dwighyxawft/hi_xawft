@@ -394,7 +394,7 @@ const register = async function(req, res){
                   bcrypt.hash(req.body.password, 10).then(function(hash){
                     bcrypt.hash(req.body.pin, 10).then(function(pin_hash){
                       req.body.pin = pin_hash;
-                      req.body.image = req.body.gender == "male" ? "image.jpg" : "female.jpg";
+                      req.body.image = req.body.gender == "male" ? "male.jpg" : "female.jpg";
                       req.body.password = hash;
                       
                       const user = new User({name: req.body.name, username: req.body.username, email: req.body.email, phone: req.body.phone, pin: req.body.pin, gender: req.body.gender, image: req.body.image, password: req.body.password, referrer: req.body.referrer});
@@ -2101,7 +2101,6 @@ const admin_send_mail = function(req, res){
     User.findOne({email: email}).then(async function(user){
       if(user){
         let transport = mailer.createTransport({
-<<<<<<< HEAD
           host: process.env.SMTP_HOSTNAME,
           port: process.env.AUTH_SMTP_PORT,
           auth: {
@@ -2109,15 +2108,6 @@ const admin_send_mail = function(req, res){
             pass: process.env.AUTH_PASSWORD
           }
       });;
-=======
-        host: process.env.SMTP_HOSTNAME,
-        port: process.env.AUTH_SMTP_PORT,
-        auth: {
-          user: process.env.AUTH_EMAIL,
-          pass: process.env.AUTH_PASSWORD
-        }
-    });;
->>>>>>> 452fe8a0a6b5efd73c6ae8310b4451bdc8669b57
         await transport.sendMail(admin_feedback(user.name, email, mail));
         res.status(200).json({status: true, msg: "Email sent successfully"});
       }else{
