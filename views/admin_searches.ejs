@@ -136,7 +136,7 @@
             $("#send-email").on("submit", function(e){
                 e.preventDefault();
                 $.ajax({
-                url: "/wallet/admin/send-mail",
+                url: "/wallet/admin/send-email",
                 type: "post",
                 data: $(this).serialize(),
                 dataType: "json",
