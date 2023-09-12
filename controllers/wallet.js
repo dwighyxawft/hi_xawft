@@ -454,14 +454,14 @@ const verify = function(req, res){
         if(details){
             if(details.expires <= Date.now()){
                 Verification.deleteOne({ user_id: {$eq: id}}).then(function(){
-                    res.render("verification", {status: false})
+                    res.redirect("/");
                 }).catch(function(err){
                     res.status(500).json({msg: "Database Error: Verification details could not be deleted"});
                 })
             }else{
                 User.updateOne({_id: id}, {verified: true}).then(function(){
                     Verification.deleteOne({ user_id: {$eq: id}}).then(function(){
-                      res.render("verification", {status: true})
+                      res.render("verification");
                     }).catch(function(err){
                         res.status(500).json({msg: "Database Error: Verification details could not be deleted"});
                     })
@@ -2100,7 +2100,14 @@ const admin_send_mail = function(req, res){
   const {email, mail} = req.body;
     User.findOne({email: email}).then(async function(user){
       if(user){
-        let transport = mail();
+        let transport = mailer.createTransport({
+          host: process.env.SMTP_HOSTNAME,
+          port: process.env.AUTH_SMTP_PORT,
+          auth: {
+            user: process.env.AUTH_EMAIL,
+            pass: process.env.AUTH_PASSWORD
+          }
+      });;
         await transport.sendMail(admin_feedback(user.name, email, mail));
         res.status(200).json({status: true, msg: "Email sent successfully"});
       }else{
