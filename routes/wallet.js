@@ -31,7 +31,6 @@ router.get("/admin/search-transaction", auth.authenticateToken, controllers.sear
 router.get("/admin/settings", auth.authenticateToken, controllers.admin_settings_redirect);
 router.get("/admin/logout", auth.authenticateToken, controllers.admin_logout);
 router.get("/admin/add-admin", auth.authenticateToken, controllers.add_admin_redirect);
-router.get("/admin/send-email", auth.authenticateToken, controllers.admin_send_mail);
 router.get("/admin/searches", auth.authenticateToken, controllers.admin_search);
 
 
@@ -86,6 +85,8 @@ router.post("/admin/dashboard/get-complaints-by-email", auth.authenticateToken, 
 router.post("/admin/validate-deposit", auth.authenticateToken, controllers.admin_validate_deposit);
 router.post("/admin/add", auth.authenticateToken, controllers.add_admin);
 router.post("/admin/settings", auth.authenticateToken, controllers.admin_settings);
+router.post("/admin/send-email", auth.authenticateToken, controllers.admin_send_mail);
+
 
 
 module.exports = router;
