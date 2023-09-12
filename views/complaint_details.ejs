@@ -36,7 +36,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 id="complaintTitle"><%= complaint.name %></h3>
-                        <p id="complaintDate">Date: <%= Date.now() %></p>
+                        <p id="complaintDate">Date: <%= Date.now().toString() %></p>
                     </div>
                     <div class="card-body">
                         <div class="card-body">
@@ -68,10 +68,6 @@
         </div>
     </main>
 
-    <!-- Footer Section -->
-    <footer class="bg-dark text-light text-center">
-        <p class="py-3">&copy; 2023 xawftly Complaints Portal</p>
-    </footer>
 </body>
 
 </html>
