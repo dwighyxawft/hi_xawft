@@ -2109,7 +2109,7 @@ const admin_send_mail = function(req, res){
     })
 }
 
-const admin_complaint = function(req, res){e
+const admin_complaint = function(req, res){
   const id = req.params.id;
   Complaints.findOne({_id: id}).then(function(complaint){
     if(complaint){
