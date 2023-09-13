@@ -461,7 +461,7 @@ const verify = function(req, res){
             }else{
                 User.updateOne({_id: id}, {verified: true}).then(function(){
                     Verification.deleteOne({ user_id: {$eq: id}}).then(function(){
-                      res.render("verification");
+                      res.redirect("/login");
                     }).catch(function(err){
                         res.status(500).json({msg: "Database Error: Verification details could not be deleted"});
                     })
